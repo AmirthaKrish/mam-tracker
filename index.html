@@ -1590,8 +1590,8 @@ function confirmDeleteCat(k,type,btn){
   panel.className='del-confirm';
   panel.style.cssText='display:flex;align-items:center;gap:6px;margin-top:6px;padding:7px 10px;background:rgba(239,35,60,.09);border-radius:8px;border:1px solid rgba(239,35,60,.25)';
   panel.innerHTML=(used?'<span style="font-size:.75rem;color:var(--re)">'+used+' transactions use this. </span>':'<span style="font-size:.75rem;color:var(--mu)">Delete this category?</span>')
-    +'<button onclick="doDeleteCat(\''+k+'\',\''+type+'\',this)" style="padding:4px 10px;background:var(--re);color:#fff;border:none;border-radius:6px;font-size:.74rem;font-weight:700;cursor:pointer;font-family:"DM Sans",sans-serif">Yes, Delete</button>'
-    +'<button onclick="this.closest('.del-confirm').remove()" style="padding:4px 10px;background:var(--s2);color:var(--mu);border:1px solid var(--bd);border-radius:6px;font-size:.74rem;font-weight:600;cursor:pointer;font-family:"DM Sans",sans-serif">Cancel</button>';
+    +'<button onclick="doDeleteCat(\''+k+'\',\''+type+'\',this)" style="padding:4px 10px;background:var(--re);color:#fff;border:none;border-radius:6px;font-size:.74rem;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif">Yes, Delete</button>'
+    +'<button onclick="this.closest('.del-confirm').remove()" style="padding:4px 10px;background:var(--s2);color:var(--mu);border:1px solid var(--bd);border-radius:6px;font-size:.74rem;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">Cancel</button>';
   // Insert after the row
   row.parentNode.insertBefore(panel, row.nextSibling);
 }
