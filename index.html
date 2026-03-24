@@ -826,18 +826,18 @@ window.addEventListener('load', async function() {
   if(th==='light') document.documentElement.setAttribute('data-theme','light');
 
   // URL priority: 1) hardcoded in file, 2) saved in localStorage
-  SURL = (HARDCODED_URL && HARDCODED_URL.trim() !== 'PASTE_YOUR_SCRIPT_URL_HERE')
+  SURL = (HARDCODED_URL && HARDCODED_URL.trim() !== 'https://script.google.com/macros/s/AKfycbxDwXC__G1061aQOmg3rJ4iUskU0YuavSti3fojSuLJKWh8Vp7aMyVKmoKMFUcryMp34A/exec')
     ? HARDCODED_URL.trim()
     : (localStorage.getItem(UK) || '');
 
-  if(!SURL || SURL === 'PASTE_YOUR_SCRIPT_URL_HERE'){
+  if(!SURL || SURL === 'https://script.google.com/macros/s/AKfycbxDwXC__G1061aQOmg3rJ4iUskU0YuavSti3fojSuLJKWh8Vp7aMyVKmoKMFUcryMp34A/exec'){
     // No URL configured — show login with a clear message
     show('scLogin');
     document.getElementById('uCards').innerHTML =
       '<div style="background:rgba(239,35,60,.09);border:1px solid rgba(239,35,60,.25);border-radius:10px;padding:14px;font-size:.82rem;line-height:1.7;color:var(--re)">'
       +'<strong>Setup needed</strong><br>'
       +'Open <code>MAM-app.html</code> in a text editor,<br>'
-      +'find <code>HARDCODED_URL = 'PASTE_YOUR_SCRIPT_URL_HERE'</code><br>'
+      +'find <code>HARDCODED_URL = 'https://script.google.com/macros/s/AKfycbxDwXC__G1061aQOmg3rJ4iUskU0YuavSti3fojSuLJKWh8Vp7aMyVKmoKMFUcryMp34A/exec'</code><br>'
       +'and replace with your Apps Script /exec URL,<br>'
       +'then re-upload to Google Drive.'
       +'</div>';
