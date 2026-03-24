@@ -830,17 +830,14 @@ window.addEventListener('load', async function() {
     ? HARDCODED_URL.trim()
     : (localStorage.getItem(UK) || '');
 
-  if(!SURL || SURL === 'https://script.google.com/macros/s/AKfycbxDwXC__G1061aQOmg3rJ4iUskU0YuavSti3fojSuLJKWh8Vp7aMyVKmoKMFUcryMp34A/exec'){
-    // No URL configured — show login with a clear message
+  if(!SURL || SURL.indexOf('PASTE_YOUR') >= 0){
     show('scLogin');
-    document.getElementById('uCards').innerHTML =
-      '<div style="background:rgba(239,35,60,.09);border:1px solid rgba(239,35,60,.25);border-radius:10px;padding:14px;font-size:.82rem;line-height:1.7;color:var(--re)">'
-      +'<strong>Setup needed</strong><br>'
-      +'Open <code>MAM-app.html</code> in a text editor,<br>'
-      +'find <code>HARDCODED_URL = "https://script.google.com/macros/s/AKfycbxDwXC__G1061aQOmg3rJ4iUskU0YuavSti3fojSuLJKWh8Vp7aMyVKmoKMFUcryMp34A/exec"</code><br>'
-      +'and replace with your Apps Script /exec URL,<br>'
-      +'then re-upload to Google Drive.'
-      +'</div>';
+    var el = document.getElementById('uCards');
+    el.innerHTML = '';
+    var msg = document.createElement('div');
+    msg.style.cssText = 'background:rgba(239,35,60,.09);border:1px solid rgba(239,35,60,.25);border-radius:10px;padding:14px;font-size:.82rem;line-height:1.8;color:var(--re)';
+    msg.innerHTML = '<strong>Setup needed</strong><br>Set HARDCODED_URL in index.html to your Apps Script /exec URL.';
+    el.appendChild(msg);
     document.getElementById('pwSec').style.display='none';
     hideLoad();
     return;
@@ -1581,18 +1578,27 @@ async function saveCat(){
   closeCatModal();rSet();renderAll();
 }
 function confirmDeleteCat(k,type,btn){
-  // Inline confirm — avoids iframe confirm() blocking
   var used=txns.filter(function(t){return t.cat===k;}).length;
   var row=btn.closest('.cat-row');
-  // Check if confirm panel already exists
   if(row.querySelector('.del-confirm')){row.querySelector('.del-confirm').remove();return;}
   var panel=document.createElement('div');
   panel.className='del-confirm';
-  panel.style.cssText='display:flex;align-items:center;gap:6px;margin-top:6px;padding:7px 10px;background:rgba(239,35,60,.09);border-radius:8px;border:1px solid rgba(239,35,60,.25)';
-  panel.innerHTML=(used?'<span style="font-size:.75rem;color:var(--re)">'+used+' transactions use this. </span>':'<span style="font-size:.75rem;color:var(--mu)">Delete this category?</span>')
-    +'<button onclick="doDeleteCat(\''+k+'\',\''+type+'\',this)" style="padding:4px 10px;background:var(--re);color:#fff;border:none;border-radius:6px;font-size:.74rem;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif">Yes, Delete</button>'
-    +'<button onclick="this.closest('.del-confirm').remove()" style="padding:4px 10px;background:var(--s2);color:var(--mu);border:1px solid var(--bd);border-radius:6px;font-size:.74rem;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">Cancel</button>';
-  // Insert after the row
+  panel.style.cssText='display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px;padding:7px 10px;background:rgba(239,35,60,.09);border-radius:8px;border:1px solid rgba(239,35,60,.25)';
+  // Build buttons using DOM — avoids ALL quote issues
+  var msg=document.createElement('span');
+  msg.style.cssText='font-size:.75rem;color:'+(used?'var(--re)':'var(--mu)');
+  msg.textContent=used?used+' transactions use this category. Delete?':'Delete this category?';
+  var yesBtn=document.createElement('button');
+  yesBtn.textContent='Yes, Delete';
+  yesBtn.style.cssText='padding:4px 10px;background:var(--re);color:#fff;border:none;border-radius:6px;font-size:.74rem;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif';
+  yesBtn.onclick=function(){doDeleteCat(k,type);};
+  var noBtn=document.createElement('button');
+  noBtn.textContent='Cancel';
+  noBtn.style.cssText='padding:4px 10px;background:var(--s2);color:var(--mu);border:1px solid var(--bd);border-radius:6px;font-size:.74rem;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif';
+  noBtn.onclick=function(){panel.remove();};
+  panel.appendChild(msg);
+  panel.appendChild(yesBtn);
+  panel.appendChild(noBtn);
   row.parentNode.insertBefore(panel, row.nextSibling);
 }
 async function doDeleteCat(k,type){
