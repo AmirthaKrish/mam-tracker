@@ -890,16 +890,23 @@ function toggleTheme(){
 // ══ API ══════════════════════════════════════════════════════
 async function GET(action){
   setSdot('ld');
-  var res=await fetch(SURL+'?action='+encodeURIComponent(action));
-  var d=await res.json();
-  setSdot(d.ok?'ok':'er'); return d;
+  try{
+    var res=await fetch(SURL+'?action='+encodeURIComponent(action));
+    var d=await res.json();
+    setSdot(d.ok?'ok':'er'); return d;
+  }catch(e){setSdot('er');throw e;}
 }
 async function POST(action,body){
+  // Use GET with encoded payload to avoid CORS preflight (405 error)
+  // Apps Script doGet handles both read and write actions
   setSdot('ld');
-  body.action=action;
-  var res=await fetch(SURL,{method:'POST',body:JSON.stringify(body),headers:{'Content-Type':'text/plain'}});
-  var d=await res.json();
-  setSdot(d.ok?'ok':'er'); return d;
+  try{
+    body.action=action;
+    var payload=encodeURIComponent(JSON.stringify(body));
+    var res=await fetch(SURL+'?action='+encodeURIComponent(action)+'&payload='+payload);
+    var d=await res.json();
+    setSdot(d.ok?'ok':'er'); return d;
+  }catch(e){setSdot('er');throw e;}
 }
 function setSdot(s){
   var d=document.getElementById('sdot');if(!d)return;
