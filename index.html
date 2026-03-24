@@ -891,22 +891,58 @@ function toggleTheme(){
 async function GET(action){
   setSdot('ld');
   try{
-    var res=await fetch(SURL+'?action='+encodeURIComponent(action));
-    var d=await res.json();
+    var res=await fetch(SURL+'?action='+encodeURIComponent(action),
+      {redirect:'follow',cache:'no-cache'});
+    var txt=await res.text();
+    var d=JSON.parse(txt);
     setSdot(d.ok?'ok':'er'); return d;
   }catch(e){setSdot('er');throw e;}
 }
 async function POST(action,body){
-  // Use GET with encoded payload to avoid CORS preflight (405 error)
-  // Apps Script doGet handles both read and write actions
   setSdot('ld');
+  body.action=action;
+  // Try POST first (works when not in sandboxed iframe)
+  // Fall back to GET with payload for CORS-restricted environments
   try{
-    body.action=action;
-    var payload=encodeURIComponent(JSON.stringify(body));
-    var res=await fetch(SURL+'?action='+encodeURIComponent(action)+'&payload='+payload);
-    var d=await res.json();
-    setSdot(d.ok?'ok':'er'); return d;
-  }catch(e){setSdot('er');throw e;}
+    var res=await fetch(SURL,{
+      method:'POST',
+      body:JSON.stringify(body),
+      headers:{'Content-Type':'text/plain'},
+      redirect:'follow',
+      cache:'no-cache'
+    });
+    if(res.ok){
+      var txt=await res.text();
+      // Check if we got HTML (redirect/error) instead of JSON
+      if(txt.trim().startsWith('<')){
+        throw new Error('Got HTML response - falling back to GET');
+      }
+      var d=JSON.parse(txt);
+      setSdot(d.ok?'ok':'er'); return d;
+    }
+    throw new Error('POST failed with status '+res.status);
+  }catch(postErr){
+    // Fallback: encode as GET request (works through CORS)
+    try{
+      var payload=JSON.stringify(body);
+      // For large payloads, split into chunks if needed
+      if(payload.length > 7000){
+        // Store in sessionStorage and send key
+        var key='mam_payload_'+Date.now();
+        try{sessionStorage.setItem(key,payload);}catch(se){}
+      }
+      var url=SURL+'?action='+encodeURIComponent(action)
+        +'&payload='+encodeURIComponent(payload);
+      var res2=await fetch(url,{redirect:'follow',cache:'no-cache'});
+      var txt2=await res2.text();
+      if(txt2.trim().startsWith('<')) throw new Error('Invalid response: '+txt2.slice(0,100));
+      var d2=JSON.parse(txt2);
+      setSdot(d2.ok?'ok':'er'); return d2;
+    }catch(getErr){
+      setSdot('er');
+      throw new Error('Both POST and GET failed. POST: '+postErr.message+' GET: '+getErr.message);
+    }
+  }
 }
 function setSdot(s){
   var d=document.getElementById('sdot');if(!d)return;
