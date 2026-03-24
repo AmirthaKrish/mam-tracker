@@ -830,7 +830,7 @@ window.addEventListener('load', async function() {
     ? HARDCODED_URL.trim()
     : (localStorage.getItem(UK) || '');
 
-  if(!SURL || SURL.indexOf('PASTE_YOUR') >= 0){
+  if(!SURL || SURL.indexOf('https://script.google.com/macros/s/AKfycbxDwXC__G1061aQOmg3rJ4iUskU0YuavSti3fojSuLJKWh8Vp7aMyVKmoKMFUcryMp34A/exec') >= 0){
     show('scLogin');
     var el = document.getElementById('uCards');
     el.innerHTML = '';
