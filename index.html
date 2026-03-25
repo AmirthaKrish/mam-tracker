@@ -826,11 +826,11 @@ window.addEventListener('load', async function() {
   if(th==='light') document.documentElement.setAttribute('data-theme','light');
 
   // URL priority: 1) hardcoded in file, 2) saved in localStorage
-  SURL = (HARDCODED_URL && HARDCODED_URL.trim() !== 'https://script.google.com/macros/s/AKfycbxDwXC__G1061aQOmg3rJ4iUskU0YuavSti3fojSuLJKWh8Vp7aMyVKmoKMFUcryMp34A/exec')
+  SURL = (HARDCODED_URL && HARDCODED_URL.trim() !== 'PASTE_YOUR_SCRIPT_URL_HERE')
     ? HARDCODED_URL.trim()
     : (localStorage.getItem(UK) || '');
 
-  if(!SURL || SURL.indexOf('https://script.google.com/macros/s/AKfycbxDwXC__G1061aQOmg3rJ4iUskU0YuavSti3fojSuLJKWh8Vp7aMyVKmoKMFUcryMp34A/exec') >= 0){
+  if(!SURL || SURL.indexOf('PASTE_YOUR') >= 0){
     show('scLogin');
     var el = document.getElementById('uCards');
     el.innerHTML = '';
