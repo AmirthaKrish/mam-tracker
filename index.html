@@ -900,8 +900,26 @@ async function GET(action){
   return apiCall(action, {});
 }
 async function POST(action, body){
+  // Special handling for addExpenses - chunk large payloads
+  if(action === 'addExpenses' && body.expenses && body.expenses.length > 20){
+    return addExpensesChunked(body.expenses);
+  }
   return apiCall(action, body);
 }
+
+async function addExpensesChunked(expenses){
+  // Split into chunks of 20 to stay within URL length limits
+  var chunkSize = 20;
+  var total = 0;
+  for(var i = 0; i < expenses.length; i += chunkSize){
+    var chunk = expenses.slice(i, i + chunkSize);
+    var r = await apiCall('addExpenses', {expenses: chunk});
+    if(!r.ok) throw new Error(r.error || 'Chunk failed at index ' + i);
+    total += chunk.length;
+  }
+  return {ok: true, count: total};
+}
+
 async function apiCall(action, body){
   setSdot('ld');
   try{
@@ -909,10 +927,14 @@ async function apiCall(action, body){
     var json = JSON.stringify(body);
     var b64  = btoa(unescape(encodeURIComponent(json)));
     var url  = SURL + '?action=' + encodeURIComponent(action) + '&d=' + encodeURIComponent(b64);
+    // Safety check - if URL too long, throw helpful error
+    if(url.length > 7500){
+      throw new Error('Payload too large (' + url.length + ' chars). Try importing fewer transactions at once.');
+    }
     var res  = await fetch(url, {redirect:'follow', cache:'no-cache'});
     var txt  = await res.text();
     if(txt.trim().startsWith('<')){
-      throw new Error('Apps Script returned HTML. Check deployment settings.');
+      throw new Error('Apps Script returned HTML. Check that deployment is set to "Anyone" access.');
     }
     var d = JSON.parse(txt);
     setSdot(d.ok ? 'ok' : 'er');
